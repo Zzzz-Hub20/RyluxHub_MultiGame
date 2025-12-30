@@ -1,10 +1,14 @@
 --====================================================
---// DRAKOSCRIPTS LOADING SCREEN (GUI ONLY)
+--// DRAKOSCRIPTS LOADING SCREEN (GUI ONLY - FLOW FIX)
 --====================================================
 
 local Players = game:GetService("Players")
+local StarterGui = game:GetService("StarterGui")
 local player = Players.LocalPlayer
 
+--====================
+-- MAIN LOADING GUI (UNCHANGED)
+--====================
 local loadingGui = Instance.new("ScreenGui")
 loadingGui.Name = "DrakoLoading"
 loadingGui.IgnoreGuiInset = true
@@ -87,89 +91,74 @@ loadingText.TextColor3 = Color3.new(1,1,1)
 loadingText.TextScaled = true
 loadingText.Parent = barBG
 
--- Fake Loading
+--====================
+-- 1 MIN 40 SEC LOADING
+--====================
+local totalTime = 100
 for i = 1, 100 do
 	bar.Size = UDim2.fromScale(i/100,1)
 	loadingText.Text = "Loading... "..i.."%"
-	task.wait(0.05)
+	task.wait(totalTime / 100)
 end
 
 loadingText.Text = "Loaded!"
-task.wait(0.5)
+task.wait(1)
 loadingGui:Destroy()
 
---====================================================
---// INSTANT STEAL GUI (VISUAL ONLY)
---====================================================
+--====================
+-- SECOND GUI (STAYS LONGER)
+--====================
+local loadedGui = Instance.new("ScreenGui")
+loadedGui.Name = "DrakoLoaded"
+loadedGui.IgnoreGuiInset = true
+loadedGui.ResetOnSpawn = false
+loadedGui.Parent = player.PlayerGui
 
-local guiParent = game:GetService("CoreGui")
-if gethui then pcall(function() guiParent = gethui() end) end
+local box = Instance.new("Frame")
+box.Size = UDim2.fromScale(0.45,0.2)
+box.Position = UDim2.fromScale(0.5,0.5)
+box.AnchorPoint = Vector2.new(0.5,0.5)
+box.BackgroundColor3 = Color3.fromRGB(20,20,20)
+box.BackgroundTransparency = 0.15
+box.Parent = loadedGui
+Instance.new("UICorner", box).CornerRadius = UDim.new(0,20)
 
-local gui = Instance.new("ScreenGui")
-gui.Name = "InstantSteal_UI"
-gui.ResetOnSpawn = false
-gui.Parent = guiParent
+local loadedText = Instance.new("TextLabel")
+loadedText.Size = UDim2.fromScale(1,1)
+loadedText.BackgroundTransparency = 1
+loadedText.Text = "SCRIPT LOADED!\nPLEASE WAIT"
+loadedText.Font = Enum.Font.GothamBold
+loadedText.TextColor3 = Color3.fromRGB(255,255,255)
+loadedText.TextScaled = true
+loadedText.Parent = box
 
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0,230,0,185)
-frame.Position = UDim2.new(0.65,-115,0.5,-92)
-frame.BackgroundColor3 = Color3.fromRGB(20,20,30)
-frame.Parent = gui
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0,16)
+--====================
+-- NOTIFICATIONS (SABAY SA GUI)
+--====================
+task.spawn(function()
+	StarterGui:SetCore("SendNotification",{
+		Title = "DrakoScripts",
+		Text = "Bypassing Anti Cheat....",
+		Duration = 3
+	})
 
-local titleBar = Instance.new("TextLabel")
-titleBar.Size = UDim2.new(1,0,0,40)
-titleBar.BackgroundTransparency = 1
-titleBar.Text = "Instant Steal"
-titleBar.Font = Enum.Font.GothamBold
-titleBar.TextSize = 16
-titleBar.TextColor3 = Color3.new(1,1,1)
-titleBar.Parent = frame
+	task.wait(3)
 
--- Dragging
-local dragging, dragStart, startPos
-titleBar.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1
-	or input.UserInputType == Enum.UserInputType.Touch then
-		dragging = true
-		dragStart = input.Position
-		startPos = frame.Position
-		input.Changed:Connect(function()
-			if input.UserInputState == Enum.UserInputState.End then
-				dragging = false
-			end
-		end)
-	end
+	StarterGui:SetCore("SendNotification",{
+		Title = "DrakoScripts",
+		Text = "Bypassing In 1–59 seconds please wait...",
+		Duration = 5
+	})
+
+	task.wait(20)
+
+	StarterGui:SetCore("SendNotification",{
+		Title = "DrakoScripts",
+		Text = "Bypassed ✅",
+		Duration = 5
+	})
 end)
 
-game:GetService("UserInputService").InputChanged:Connect(function(input)
-	if dragging then
-		local delta = input.Position - dragStart
-		frame.Position = UDim2.new(
-			startPos.X.Scale,
-			startPos.X.Offset + delta.X,
-			startPos.Y.Scale,
-			startPos.Y.Offset + delta.Y
-		)
-	end
-end)
-
--- Buttons (NO FUNCTION)
-local function makeBtn(text,y,color)
-	local b = Instance.new("TextButton")
-	b.Size = UDim2.new(1,-20,0,32)
-	b.Position = UDim2.new(0,10,0,y)
-	b.Text = text
-	b.Font = Enum.Font.GothamBold
-	b.TextSize = 14
-	b.BackgroundColor3 = color
-	b.TextColor3 = Color3.new(1,1,1)
-	b.AutoButtonColor = false
-	b.Parent = frame
-	Instance.new("UICorner", b).CornerRadius = UDim.new(0,10)
-	return b
-end
-
-makeBtn("INSTANT STEAL", 50, Color3.fromRGB(220,60,60))
-makeBtn("TP FORWARD", 90, Color3.fromRGB(90,150,255))
-makeBtn("FAST STEAL: OFF", 130, Color3.fromRGB(120,120,140))
+-- SECOND GUI STAYS LONGER
+task.wait(35) -- change time if you want
+loadedGui:Destroy()
